@@ -4,165 +4,238 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DEOBLOCK customer map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0b0d10;--panel:#111418;--line:#1f242b;--text:#e8eaed;--mute:#8a929c;
-        --nba:#ff6b2c;--pro:#a78bfa;--ncaa:#3ba7ff;--club:#34d399;--hq:#ffffff}
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
-  #app{display:flex;height:100%}
-  aside{width:360px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column}
-  .head{padding:22px 22px 14px}
-  .brand{font-weight:800;letter-spacing:.14em;font-size:13px;color:var(--mute)}
-  h1{font-size:24px;font-weight:800;margin-top:6px;line-height:1.15}
-  .sub{color:var(--mute);font-size:13px;margin-top:6px;line-height:1.45}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 22px 14px}
-  .stat{background:#161a20;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
-  .stat b{display:block;font-size:20px;font-weight:800}
-  .stat span{font-size:11px;color:var(--mute)}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 22px 12px}
-  .chip{border:1px solid var(--line);background:#161a20;color:var(--text);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
-  .chip i{width:8px;height:8px;border-radius:50%;display:inline-block}
-  .chip.off{opacity:.35}
-  .search{margin:0 22px 10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0e1115;color:var(--text);font:inherit;font-size:13px;outline:none}
-  .search:focus{border-color:#3a414b}
-  ul{list-style:none;overflow:auto;flex:1;padding:4px 12px 12px}
-  li{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer}
-  li:hover{background:#171b21}
-  li .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-  li .n{font-size:13.5px;font-weight:600}
-  li .m{font-size:11.5px;color:var(--mute)}
-  li .q{margin-left:auto;font-size:10px;font-weight:700;color:#ffd166;border:1px solid #3a3320;padding:2px 6px;border-radius:6px}
-  .foot{padding:12px 22px;border-top:1px solid var(--line);font-size:11px;color:var(--mute);line-height:1.5}
-  .foot a{color:#9ab}
-  #map{flex:1;background:#0b0d10}
-  .leaflet-popup-content-wrapper{background:#13171c;color:var(--text);border-radius:14px;border:1px solid #262c34;box-shadow:0 10px 40px rgba(0,0,0,.5)}
-  .leaflet-popup-tip{background:#13171c}
-  .leaflet-popup-content{margin:14px 16px;font-family:Inter,sans-serif;width:250px!important}
-  .pp-tag{font-size:10px;font-weight:800;letter-spacing:.1em}
-  .pp-n{font-size:16px;font-weight:800;margin:3px 0 2px}
-  .pp-c{font-size:12px;color:var(--mute)}
-  .pp-q{margin-top:10px;font-size:12.5px;line-height:1.5;color:#cfd4da;border-left:2px solid #ffd166;padding-left:10px}
-  .pp-w{margin-top:6px;font-size:11px;color:var(--mute)}
-  .mk{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#0b0d10;border:2px solid rgba(255,255,255,.85);box-shadow:0 0 0 4px rgba(0,0,0,.25),0 4px 14px rgba(0,0,0,.5)}
-  .mk.hq{background:#fff;font-size:8px}
-  .leaflet-control-attribution{background:rgba(11,13,16,.7)!important;color:#667!important}
-  .leaflet-control-attribution a{color:#889!important}
-  @media(max-width:760px){
-    #app{flex-direction:column-reverse}
-    aside{width:100%;height:46%;border-right:0;border-top:1px solid var(--line)}
-    .head{padding:14px 16px 8px} h1{font-size:19px} .sub{display:none}
-    .stats,.chips{padding-left:16px;padding-right:16px} .search{margin-left:16px;margin-right:16px}
-  }
+:root{--bg:#f6f5f1;--ink:#121417;--mute:#6b7280;--line:#e4e2dc;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#app{display:grid;grid-template-columns:380px 1fr;height:100%}
+aside{border-right:1px solid var(--line);background:#fbfaf7;display:flex;flex-direction:column;min-height:0}
+.top{padding:24px 24px 14px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:.18em;color:var(--mute)}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.lede{font-size:13px;color:var(--mute);margin-top:6px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 24px 14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:10.5px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 24px 12px}
+.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font:600 12px Inter,sans-serif;cursor:pointer;color:var(--ink)}
+.chip i{width:8px;height:8px;border-radius:50%}
+.chip.off{opacity:.35}
+.search{margin:0 24px 8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font:500 13px Inter,sans-serif;outline:none}
+.search:focus{border-color:#bdbab2}
+#list{overflow:auto;flex:1;padding:4px 14px 10px}
+.grp{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--mute);padding:12px 10px 6px}
+.row{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:10px;cursor:pointer}
+.row:hover,.row.sel{background:#efede7}
+.row img,.row .ph{width:30px;height:30px;object-fit:contain;flex-shrink:0}
+.ph{border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800}
+.row .n{font-size:13.5px;font-weight:700}
+.row .m{font-size:11.5px;color:var(--mute)}
+.badge{margin-left:auto;font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#92400e;background:#fef3c7;padding:3px 6px;border-radius:6px}
+.foot{border-top:1px solid var(--line);padding:12px 24px;font-size:11px;color:var(--mute);line-height:1.55}
+.foot a{color:var(--ink)}
+main{position:relative;min-height:0;overflow:hidden}
+svg{width:100%;height:100%;display:block;cursor:grab}
+svg:active{cursor:grabbing}
+.land{fill:#ecebe6;stroke:#d9d6ce;stroke-width:.6}
+.state{fill:#fff;stroke:#d6d3cb;stroke-width:.6;transition:fill .2s}
+.state.has1{fill:#eef2fb}.state.has2{fill:#dde6f8}.state.has3{fill:#c9d7f4}
+.state:hover{fill:#f4efe2}
+.nation{fill:none;stroke:#b9b5ab;stroke-width:1}
+.pin{cursor:pointer}
+.pin circle.bg{fill:#fff;stroke-width:2.2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.18))}
+.pin:hover circle.bg,.pin.sel circle.bg{stroke-width:3.4}
+.pin text{font:800 7px Inter,sans-serif;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.ctrl{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;gap:6px}
+.ctrl button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:#fff;font:700 16px Inter,sans-serif;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.legend{position:absolute;left:16px;bottom:16px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:11.5px;display:flex;gap:12px;flex-wrap:wrap;backdrop-filter:blur(6px)}
+.legend span{display:flex;align-items:center;gap:6px;font-weight:600}
+.legend i{width:10px;height:10px;border-radius:50%}
+.card{position:absolute;right:16px;bottom:16px;width:340px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.14);padding:18px;transform:translateY(16px);opacity:0;pointer-events:none;transition:.22s}
+.card.on{transform:none;opacity:1;pointer-events:auto}
+.card .x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:20px;color:var(--mute);cursor:pointer}
+.card .hd{display:flex;gap:14px;align-items:center}
+.card .hd img,.card .hd .ph{width:58px;height:58px;object-fit:contain;flex-shrink:0}
+.card .hd .ph{font-size:14px}
+.pill{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.1em;color:#fff;padding:3px 8px;border-radius:999px}
+.card h2{font-size:19px;font-weight:800;letter-spacing:-.01em;margin-top:5px}
+.card .loc{font-size:12.5px;color:var(--mute);margin-top:2px}
+.kv{margin-top:14px;display:grid;grid-template-columns:80px 1fr;gap:7px 10px;font-size:12.5px}
+.kv dt{color:var(--mute);font-weight:600}
+.kv dd{font-weight:600}
+.quote{margin-top:14px;background:#faf8f3;border-left:3px solid #f59e0b;border-radius:8px;padding:11px 12px;font-size:13px;line-height:1.5}
+.quote small{display:block;margin-top:6px;color:var(--mute);font-weight:600;font-size:11.5px}
+.tip{position:absolute;pointer-events:none;background:#121417;color:#fff;font-size:12px;font-weight:700;padding:6px 9px;border-radius:8px;opacity:0;transform:translate(-50%,-140%);white-space:nowrap}
+@media(max-width:820px){
+  #app{grid-template-columns:1fr;grid-template-rows:56% 44%}
+  aside{order:2;border-right:0;border-top:1px solid var(--line)}
+  .top{padding:14px 16px 8px} h1{font-size:20px} .lede{display:none}
+  .stats,.chips{padding-left:16px;padding-right:16px} .search{margin-left:16px;margin-right:16px}
+  .card{left:10px;right:10px;width:auto;bottom:10px}
+  .legend{display:none}
+}
 </style>
 </head>
 <body>
 <div id="app">
   <aside>
-    <div class="head">
-      <div class="brand">DEOBLOCK</div>
-      <h1>Who buys DEOBLOCK</h1>
-      <p class="sub">Every team logo on deoblock.com/pages/teams, mapped to its home city. Gold "quote" = equipment-manager testimonial on their site.</p>
+    <div class="top">
+      <div class="kicker">DEOBLOCK · CUSTOMER MAP</div>
+      <h1>Who keeps their locker room fresh</h1>
+      <p class="lede">Every team and club publicly tied to DEOBLOCK: logos on their Teams page, equipment-manager testimonials, press and LinkedIn posts. Click any pin or name.</p>
     </div>
     <div class="stats" id="stats"></div>
     <div class="chips" id="chips"></div>
-    <input class="search" id="q" placeholder="Search team, city, state...">
-    <ul id="list"></ul>
-    <div class="foot">Source: <a href="https://deoblock.com/pages/teams" target="_blank">deoblock.com/pages/teams</a> (checked Oct 26, 2026). Their disclaimer: logos show teams that purchased, not partnerships. Pins = team home city, not exact delivery address. Teal-panther logo read as Carolina Panthers (not confirmed). Retail (Jerry's Hockey, 4 Chicago stores) not pinned.</div>
+    <input class="search" id="q" placeholder="Search team, city or state">
+    <div id="list"></div>
+    <div class="foot">DEOBLOCK says 75+ NCAA and pro programs buy from them; this map shows the ones that are publicly identifiable. Logos mean "purchased", not partnership (their own disclaimer). Pins sit at the team's home venue. Sources: <a href="https://deoblock.com/pages/teams" target="_blank">deoblock.com/pages/teams</a>, Daily Herald (2021), DEOBLOCK LinkedIn. Logos: ESPN. Checked Oct 26, 2026.</div>
   </aside>
-  <div id="map"></div>
+  <main>
+    <svg id="map"></svg>
+    <div class="ctrl"><button id="zin">+</button><button id="zout">&minus;</button><button id="zreset" title="Reset">&#8634;</button></div>
+    <div class="legend" id="legend"></div>
+    <div class="tip" id="tip"></div>
+    <div class="card" id="card"></div>
+  </main>
 </div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 <script>
-const CAT = {
-  nba:  {label:"NBA",  color:"var(--nba)",  hex:"#ff6b2c"},
-  pro:  {label:"Other pro", color:"var(--pro)", hex:"#a78bfa"},
-  ncaa: {label:"NCAA", color:"var(--ncaa)", hex:"#3ba7ff"},
-  club: {label:"Club", color:"var(--club)", hex:"#34d399"},
-};
-const T = [
-  ["Chicago Bulls","nba","Chicago, IL",41.8807,-87.6742,"CHI"],
-  ["Boston Celtics","nba","Boston, MA",42.3662,-71.0621,"BOS"],
-  ["LA Clippers","nba","Inglewood, CA",33.9447,-118.3433,"LAC"],
-  ["New York Knicks","nba","New York, NY",40.7505,-73.9934,"NYK",{w:"Kyle, Equipment Operations",q:"I've been an equipment manager for over 15 years, and getting the harsh odor out of the locker room was impossible until DEOBLOCK. Day and night results compared to anything else on the market."}],
-  ["San Antonio Spurs","nba","San Antonio, TX",29.4270,-98.4375,"SAS"],
-  ["Carolina Panthers (NFL)","pro","Charlotte, NC",35.2258,-80.8528,"CAR"],
-  ["Edmonton Elks (CFL)","pro","Edmonton, AB",53.5597,-113.4764,"EDM"],
-  ["Angel City FC (NWSL)","pro","Los Angeles, CA",34.0128,-118.2841,"ACFC"],
-  ["U.S. Soccer","pro","Chicago, IL",41.8579,-87.6208,"USA"],
-  ["Medinah Country Club","club","Medinah, IL",41.9814,-88.0459,"MCC",{w:"Fito, Locker Room Manager",q:"I have been at the club for over 30 years, this is the best product I have used."}],
-  ["BYU","ncaa","Provo, UT",40.2518,-111.6493,"BYU"],
-  ["Chattanooga","ncaa","Chattanooga, TN",35.0456,-85.2997,"UTC"],
-  ["Colorado","ncaa","Boulder, CO",40.0076,-105.2659,"CU",{w:"Bill, Director of Basketball Operations",q:"We use DEOBLOCK to keep the aroma in the locker room and travel bags pleasant. It is a noticeable difference in the locker room! We recommend DEOBLOCK to ALL!"}],
-  ["Creighton","ncaa","Omaha, NE",41.2655,-95.9467,"CRE"],
-  ["Dayton","ncaa","Dayton, OH",39.7404,-84.1793,"UD"],
-  ["DePaul","ncaa","Chicago, IL",41.9245,-87.6553,"DPU"],
-  ["Florida","ncaa","Gainesville, FL",29.6436,-82.3549,"UF"],
-  ["Louisiana Tech","ncaa","Ruston, LA",32.5276,-92.6479,"LT",{w:"Jason, Equipment Manager",q:"The most effective product we have ever used to neutralize bad odors. Nothing compares."}],
-  ["Navy","ncaa","Annapolis, MD",38.9827,-76.4842,"NAVY"],
-  ["Northwestern","ncaa","Evanston, IL",42.0565,-87.6753,"NU"],
-  ["Rutgers","ncaa","Piscataway, NJ",40.5008,-74.4474,"RU"],
-  ["Southern Miss","ncaa","Hattiesburg, MS",31.3285,-89.3346,"USM",{w:"Reid, Equipment Operations",q:"You guys definitely solved our locker room odor, the locker room smells 1000x better!"}],
-  ["San José State","ncaa","San Jose, CA",37.3352,-121.8811,"SJSU"],
-  ["SMU","ncaa","Dallas, TX",32.8412,-96.7845,"SMU",{w:"Frank, Equipment Manager",q:"100% amazing product! Has helped eliminate the odors in our locker room and would highly suggest placing in your facility!"}],
-  ["Maryland","ncaa","College Park, MD",38.9869,-76.9426,"UMD"],
-  ["TCU","ncaa","Fort Worth, TX",32.7096,-97.3628,"TCU"],
-  ["UAB","ncaa","Birmingham, AL",33.5021,-86.8064,"UAB"],
-  ["UCF","ncaa","Orlando, FL",28.6024,-81.2001,"UCF"],
-  ["UCLA","ncaa","Los Angeles, CA",34.0689,-118.4452,"UCLA"],
-  ["Charlotte","ncaa","Charlotte, NC",35.3071,-80.7352,"CLT",{w:"Dale, Director of Football Equipment",q:"Our locker room smelled like a wet dog. I ordered 150 DEOBLOCKS and put them in each locker, in trunks with helmets/shoulder pads, cleats. It made a huge difference."}],
-  ["North Carolina","ncaa","Chapel Hill, NC",35.9049,-79.0469,"UNC"],
-  ["Virginia","ncaa","Charlottesville, VA",38.0336,-78.5080,"UVA",{w:"Greg, Equipment Operations",q:"I can tell a difference in the whole locker room after these are in each locker. DEOBLOCK helped remove the odor from our wrestling shoes."}],
-  ["South Alabama","ncaa","Mobile, AL",30.6968,-88.1787,"JAGS",{w:"Davonte, Equipment Manager",q:"Amazing product! Our athletes noticed a big difference and are loving it."}],
-].map(r=>({name:r[0],cat:r[1],city:r[2],lat:r[3],lng:r[4],ab:r[5],t:r[6]}));
+const CAT={nba:{label:"NBA",hex:"#e8590c"},pro:{label:"Other pro",hex:"#7c3aed"},ncaa:{label:"NCAA",hex:"#1d4ed8"},club:{label:"Clubs",hex:"#059669"}};
+const E=id=>`https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`, N=a=>`https://a.espncdn.com/i/teamlogos/nba/500/${a}.png`;
+const LOGO="Logo on deoblock.com Teams page", TEST="testimonial";
+const T=[
+ ["Chicago Bulls","nba","Chicago, IL","United Center",41.8807,-87.6742,N("chi"),"CHI",LOGO],
+ ["Boston Celtics","nba","Boston, MA","TD Garden",42.3662,-71.0621,N("bos"),"BOS",LOGO],
+ ["LA Clippers","nba","Inglewood, CA","Intuit Dome",33.9447,-118.3433,N("lac"),"LAC",LOGO],
+ ["New York Knicks","nba","New York, NY","Madison Square Garden",40.7505,-73.9934,N("ny"),"NYK",LOGO+" + "+TEST,{w:"Kyle, Equipment Operations",q:"I've been an equipment manager for over 15 years, and getting the harsh odor out of the locker room was impossible until DEOBLOCK. Day and night results compared to anything else on the market."}],
+ ["San Antonio Spurs","nba","San Antonio, TX","Frost Bank Center",29.4270,-98.4375,N("sa"),"SAS",LOGO],
+ ["Edmonton Elks (CFL)","pro","Edmonton, AB, Canada","Commonwealth Stadium",53.5597,-113.4764,null,"ELKS",LOGO],
+ ["Angel City FC (NWSL)","pro","Los Angeles, CA","BMO Stadium",34.0128,-118.2841,null,"ACFC",LOGO],
+ ["U.S. Soccer","pro","Chicago, IL","Soccer House HQ",41.8579,-87.6208,null,"USS",LOGO],
+ ["Medinah Country Club","club","Medinah, IL","Member locker rooms",41.9814,-88.0459,"https://deoblock.com/cdn/shop/files/logo-medinah-cc.png?width=160","MCC",LOGO+" + "+TEST,{w:"Fito, Locker Room Manager",q:"I have been at the club for over 30 years, this is the best product I have used."}],
+ ["The Bridges (Rancho Santa Fe)","club","Rancho Santa Fe, CA","Member lockers",33.0236,-117.1666,null,"BRG","DEOBLOCK LinkedIn post (site visit, \"continued partnership\")"],
+ ["BYU","ncaa","Provo, UT","",40.2518,-111.6493,E(252),"BYU",LOGO],
+ ["Chattanooga","ncaa","Chattanooga, TN","",35.0456,-85.2997,E(236),"UTC",LOGO],
+ ["Chicago State","ncaa","Chicago, IL","",41.7193,-87.6100,E(2130),"CSU",LOGO+" + LinkedIn (equipment staff thanked DEOBLOCK)"],
+ ["Colorado","ncaa","Boulder, CO","Men's basketball",40.0076,-105.2659,E(38),"CU",LOGO+" + "+TEST,{w:"Bill, Director of Basketball Operations",q:"We use DEOBLOCK to keep the aroma in the locker room and travel bags pleasant. It is a noticeable difference in the locker room! We recommend DEOBLOCK to ALL!"}],
+ ["Creighton","ncaa","Omaha, NE","",41.2655,-95.9467,E(156),"CRE",LOGO],
+ ["Dayton","ncaa","Dayton, OH","",39.7404,-84.1793,E(2168),"UD",LOGO],
+ ["DePaul","ncaa","Chicago, IL","Founders' alma mater",41.9245,-87.6553,E(305),"DPU",LOGO],
+ ["Florida","ncaa","Gainesville, FL","",29.6436,-82.3549,E(57),"UF",LOGO],
+ ["Louisiana Tech","ncaa","Ruston, LA","",32.5276,-92.6479,E(2348),"LT",LOGO+" + "+TEST,{w:"Jason, Equipment Manager",q:"The most effective product we have ever used to neutralize bad odors. Nothing compares."}],
+ ["Navy","ncaa","Annapolis, MD","",38.9827,-76.4842,E(2426),"NAVY",LOGO],
+ ["Northern Illinois","ncaa","DeKalb, IL","Football: custom Huskies-logo cubes in every locker",41.9341,-88.7750,E(2459),"NIU","Daily Herald, Sept 2021"],
+ ["Northwestern","ncaa","Evanston, IL","",42.0565,-87.6753,E(77),"NU",LOGO],
+ ["Rutgers","ncaa","Piscataway, NJ","",40.5008,-74.4474,E(164),"RU",LOGO],
+ ["Southern Miss","ncaa","Hattiesburg, MS","",31.3285,-89.3346,E(2572),"USM",LOGO+" + "+TEST,{w:"Reid, Equipment Operations",q:"You guys definitely solved our locker room odor, the locker room smells 1000x better!"}],
+ ["San José State","ncaa","San Jose, CA","",37.3352,-121.8811,E(23),"SJSU",LOGO],
+ ["SMU","ncaa","Dallas, TX","",32.8412,-96.7845,E(2567),"SMU",LOGO+" + "+TEST,{w:"Frank, Equipment Manager",q:"100% amazing product! Has helped eliminate the odors in our locker room and would highly suggest placing in your facility!"}],
+ ["Maryland","ncaa","College Park, MD","",38.9869,-76.9426,E(120),"UMD",LOGO],
+ ["TCU","ncaa","Fort Worth, TX","",32.7096,-97.3628,E(2628),"TCU",LOGO],
+ ["UAB","ncaa","Birmingham, AL","",33.5021,-86.8064,E(5),"UAB",LOGO],
+ ["UCF","ncaa","Orlando, FL","",28.6024,-81.2001,E(2116),"UCF",LOGO],
+ ["UCLA","ncaa","Los Angeles, CA","",34.0689,-118.4452,E(26),"UCLA",LOGO],
+ ["Charlotte","ncaa","Charlotte, NC","Football: 150 DEOBLOCKs, one per locker",35.3071,-80.7352,E(2429),"CLT",LOGO+" + "+TEST,{w:"Dale, Director of Football Equipment",q:"Our locker room smelled like a wet dog. I ordered 150 DEOBLOCKS and put them in each locker, in trunks with helmets/shoulder pads, cleats. It made a huge difference."}],
+ ["North Carolina","ncaa","Chapel Hill, NC","",35.9049,-79.0469,E(153),"UNC",LOGO],
+ ["Virginia","ncaa","Charlottesville, VA","Incl. wrestling",38.0336,-78.5080,E(258),"UVA",LOGO+" + "+TEST,{w:"Greg, Equipment Operations",q:"I can tell a difference in the whole locker room after these are in each locker. DEOBLOCK helped remove the odor from our wrestling shoes."}],
+ ["South Alabama","ncaa","Mobile, AL","",30.6968,-88.1787,E(6),"USA",LOGO+" + "+TEST,{w:"Davonte, Equipment Manager",q:"Amazing product! Our athletes noticed a big difference and are loving it."}],
+].map((r,i)=>({i,name:r[0],cat:r[1],city:r[2],venue:r[3],lat:r[4],lng:r[5],logo:r[6],ab:r[7],src:r[8],t:r[9]}));
+const HQ={lat:41.8676,lng:-87.6270};
 
-const map = L.map('map',{zoomControl:false,worldCopyJump:true}).setView([39.5,-96],4);
-L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+const svg=d3.select("#map"), g=svg.append("g"), gLand=g.append("g"), gStates=g.append("g"), gNation=g.append("g"), gPins=g.append("g");
+const tip=document.getElementById("tip"), card=document.getElementById("card");
+let proj, path, zoom, k=1, sel=null;
+const on={nba:true,pro:true,ncaa:true,club:true};
 
-const hq = L.marker([41.8676,-87.6270],{icon:L.divIcon({className:'',html:'<div class="mk hq">HQ</div>',iconSize:[30,30],iconAnchor:[15,15]})})
-  .bindPopup('<div class="pp-tag" style="color:#fff">HEADQUARTERS</div><div class="pp-n">DEOBLOCK</div><div class="pp-c">Chicago, IL · DEO Company LLC</div>').addTo(map);
-
-const on = {nba:true,pro:true,ncaa:true,club:true};
-T.forEach(t=>{
-  const c = CAT[t.cat];
-  t.m = L.marker([t.lat,t.lng],{icon:L.divIcon({className:'',html:`<div class="mk" style="background:${c.hex}">${t.ab}</div>`,iconSize:[30,30],iconAnchor:[15,15]}),riseOnHover:true})
-    .bindPopup(`<div class="pp-tag" style="color:${c.hex}">${c.label.toUpperCase()}</div><div class="pp-n">${t.name}</div><div class="pp-c">${t.city}</div>`+
-      (t.t?`<div class="pp-q">"${t.t.q}"</div><div class="pp-w">${t.t.w}</div>`:''))
-    .addTo(map);
+Promise.all([
+  d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json")
+]).then(([us,world])=>{
+  const states=topojson.feature(us,us.objects.states).features.filter(f=>!["02","15","60","66","69","72","78"].includes(f.id));
+  const countries=topojson.feature(world,world.objects.countries).features.filter(f=>["124","484"].includes(f.id));
+  const W=svg.node().clientWidth, H=svg.node().clientHeight;
+  proj=d3.geoConicConformal().parallels([33,45]).rotate([97,0]);
+  proj.fitExtent([[40,50],[W-40,H-40]],{type:"MultiPoint",coordinates:[[-124.5,24.5],[-67,47.5],[-113.5,54.5],[-80,25]]});
+  path=d3.geoPath(proj);
+  gLand.selectAll("path").data(countries).join("path").attr("class","land").attr("d",path);
+  T.forEach(t=>{const s=states.find(f=>d3.geoContains(f,[t.lng,t.lat])); t.state=s?s.properties.name:(t.city.includes("Canada")?"Canada":"");});
+  const cnt=d3.rollup(T,v=>v.length,d=>d.state);
+  gStates.selectAll("path").data(states).join("path")
+    .attr("class",d=>{const c=cnt.get(d.properties.name)||0;return "state"+(c?` has${Math.min(c,3)}`:"");})
+    .attr("d",path)
+    .on("mousemove",(e,d)=>{const c=cnt.get(d.properties.name)||0;showTip(e,`${d.properties.name}${c?` · ${c} client${c>1?"s":""}`:""}`);})
+    .on("mouseleave",hideTip);
+  gNation.append("path").datum(topojson.mesh(us,us.objects.nation)).attr("class","nation").attr("d",path);
+  drawPins(); buildSide();
+  zoom=d3.zoom().scaleExtent([1,16]).on("zoom",e=>{k=e.transform.k;g.attr("transform",e.transform);scalePins();});
+  svg.call(zoom).on("dblclick.zoom",null);
+  document.getElementById("zin").onclick=()=>svg.transition().call(zoom.scaleBy,1.6);
+  document.getElementById("zout").onclick=()=>svg.transition().call(zoom.scaleBy,1/1.6);
+  document.getElementById("zreset").onclick=()=>{svg.transition().duration(700).call(zoom.transform,d3.zoomIdentity);closeCard();};
 });
 
-const stats = document.getElementById('stats');
-const count = k=>T.filter(t=>t.cat===k).length;
-stats.innerHTML = `<div class="stat"><b>${T.length}</b><span>teams</span></div>`+
-  ['nba','ncaa','pro'].map(k=>`<div class="stat"><b style="color:${CAT[k].hex}">${count(k)}</b><span>${CAT[k].label}</span></div>`).join('');
+function drawPins(){
+  const hq=gPins.append("g").attr("class","pin hq").datum(HQ).attr("transform",`translate(${proj([HQ.lng,HQ.lat])})`);
+  hq.append("rect").attr("x",-6).attr("y",-6).attr("width",12).attr("height",12).attr("rx",2).attr("fill","#121417").attr("transform","rotate(45)");
+  hq.on("mousemove",e=>showTip(e,"DEOBLOCK HQ · Chicago, IL")).on("mouseleave",hideTip);
+  const pins=gPins.selectAll("g.team").data(T).join("g").attr("class","pin team")
+    .attr("transform",d=>`translate(${proj([d.lng,d.lat])})`)
+    .on("mousemove",(e,d)=>showTip(e,`${d.name} · ${d.city}`)).on("mouseleave",hideTip)
+    .on("click",(e,d)=>{e.stopPropagation();select(d,false);});
+  pins.append("circle").attr("class","bg").attr("r",13).attr("stroke",d=>CAT[d.cat].hex);
+  pins.filter(d=>d.logo).append("image").attr("href",d=>d.logo).attr("x",-9.5).attr("y",-9.5).attr("width",19).attr("height",19);
+  pins.filter(d=>!d.logo).each(function(d){const s=d3.select(this);s.select("circle").style("fill",CAT[d.cat].hex);s.append("text").text(d.ab.slice(0,4));});
+}
+function scalePins(){gPins.selectAll(".pin").attr("transform",d=>`translate(${proj([d.lng,d.lat])}) scale(${1/Math.sqrt(k)})`);}
 
-const chips = document.getElementById('chips');
-Object.entries(CAT).forEach(([k,c])=>{
-  const b=document.createElement('button'); b.className='chip';
-  b.innerHTML=`<i style="background:${c.hex}"></i>${c.label} · ${count(k)}`;
-  b.onclick=()=>{on[k]=!on[k]; b.classList.toggle('off',!on[k]); render();};
-  chips.appendChild(b);
-});
+function showTip(e,txt){const r=document.querySelector("main").getBoundingClientRect();tip.textContent=txt;tip.style.left=(e.clientX-r.left)+"px";tip.style.top=(e.clientY-r.top)+"px";tip.style.opacity=1;}
+function hideTip(){tip.style.opacity=0;}
 
-const list=document.getElementById('list'), q=document.getElementById('q');
-const order={nba:0,pro:1,club:2,ncaa:3};
+function logoHTML(d){return d.logo?`<img src="${d.logo}" alt="">`:`<div class="ph" style="background:${CAT[d.cat].hex}">${d.ab.slice(0,4)}</div>`;}
+function select(d,fly){
+  sel=d; document.querySelectorAll(".row").forEach(r=>r.classList.toggle("sel",+r.dataset.i===d.i));
+  gPins.selectAll(".team").classed("sel",x=>x===d).filter(x=>x===d).raise();
+  const c=CAT[d.cat];
+  const st=d.state&&d.state!=="Canada"?d.state:"";
+  card.innerHTML=`<button class="x" onclick="closeCard()">&times;</button>
+    <div class="hd">${logoHTML(d)}<div><span class="pill" style="background:${c.hex}">${c.label.toUpperCase()}</span><h2>${d.name}</h2><div class="loc">${d.city}${st?" · "+st:""}</div></div></div>
+    <dl class="kv">${d.venue?`<dt>Where</dt><dd>${d.venue}</dd>`:""}<dt>Evidence</dt><dd>${d.src}</dd><dt>Nearby</dt><dd>${nearby(d)}</dd></dl>
+    ${d.t?`<div class="quote">"${d.t.q}"<small>${d.t.w}</small></div>`:""}`;
+  card.classList.add("on");
+  if(fly){const [x,y]=proj([d.lng,d.lat]);const W=svg.node().clientWidth,H=svg.node().clientHeight;const s=5;
+    svg.transition().duration(900).call(zoom.transform,d3.zoomIdentity.translate(W/2-s*x,H/2.6-s*y).scale(s));}
+}
+function nearby(d){return T.filter(x=>x!==d).map(x=>({x,mi:d3.geoDistance([d.lng,d.lat],[x.lng,x.lat])*3959})).sort((a,b)=>a.mi-b.mi).slice(0,2).map(n=>`${n.x.name} (${Math.round(n.mi)} mi)`).join(", ");}
+function closeCard(){card.classList.remove("on");sel=null;document.querySelectorAll(".row.sel").forEach(r=>r.classList.remove("sel"));gPins.selectAll(".team").classed("sel",false);}
+svg.on("click",closeCard);
+
+function buildSide(){
+  const c=k=>T.filter(t=>t.cat===k).length;
+  document.getElementById("stats").innerHTML=`<div class="stat"><b>${T.length}</b><span>Clients</span></div>`+
+    ["nba","ncaa","pro"].map(k=>`<div class="stat"><b style="color:${CAT[k].hex}">${c(k)}</b><span>${CAT[k].label}</span></div>`).join("");
+  document.getElementById("legend").innerHTML=Object.values(CAT).map(v=>`<span><i style="background:${v.hex}"></i>${v.label}</span>`).join("")+`<span><i style="background:#121417;border-radius:2px"></i>HQ</span>`;
+  const chips=document.getElementById("chips");
+  Object.entries(CAT).forEach(([k,v])=>{const b=document.createElement("button");b.className="chip";b.innerHTML=`<i style="background:${v.hex}"></i>${v.label} · ${c(k)}`;
+    b.onclick=()=>{on[k]=!on[k];b.classList.toggle("off",!on[k]);render();};chips.appendChild(b);});
+  document.getElementById("q").oninput=render; render();
+}
 function render(){
-  const s=q.value.trim().toLowerCase();
-  list.innerHTML='';
-  T.slice().sort((a,b)=>order[a.cat]-order[b.cat]||a.name.localeCompare(b.name)).forEach(t=>{
-    const vis = on[t.cat] && (!s || (t.name+' '+t.city).toLowerCase().includes(s));
-    if(vis){ if(!map.hasLayer(t.m)) t.m.addTo(map);} else { map.removeLayer(t.m); return; }
-    const li=document.createElement('li');
-    li.innerHTML=`<span class="dot" style="background:${CAT[t.cat].hex}"></span><div><div class="n">${t.name}</div><div class="m">${t.city}</div></div>`+(t.t?'<span class="q">QUOTE</span>':'');
-    li.onclick=()=>{map.flyTo([t.lat,t.lng],11,{duration:1.1}); setTimeout(()=>t.m.openPopup(),1150);};
-    list.appendChild(li);
+  const s=document.getElementById("q").value.trim().toLowerCase(), list=document.getElementById("list");
+  const vis=t=>on[t.cat]&&(!s||(t.name+" "+t.city+" "+t.state).toLowerCase().includes(s));
+  gPins.selectAll(".team").style("display",t=>vis(t)?null:"none");
+  list.innerHTML="";
+  ["nba","pro","club","ncaa"].forEach(k=>{
+    const rows=T.filter(t=>t.cat===k&&vis(t)).sort((a,b)=>a.name.localeCompare(b.name));
+    if(!rows.length)return;
+    list.insertAdjacentHTML("beforeend",`<div class="grp">${CAT[k].label.toUpperCase()} · ${rows.length}</div>`);
+    rows.forEach(t=>{const el=document.createElement("div");el.className="row"+(sel===t?" sel":"");el.dataset.i=t.i;
+      el.innerHTML=`${logoHTML(t)}<div><div class="n">${t.name}</div><div class="m">${t.city}</div></div>${t.t?'<span class="badge">QUOTE</span>':""}`;
+      el.onclick=()=>select(t,true);list.appendChild(el);});
   });
 }
-q.oninput=render; render();
 </script>
 </body>
 </html>
