@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DEOBLOCK customer map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0d10;--panel:#111418;--line:#1f242b;--text:#e8eaed;--mute:#8a929c;
+        --nba:#ff6b2c;--pro:#a78bfa;--ncaa:#3ba7ff;--club:#34d399;--hq:#ffffff}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+  #app{display:flex;height:100%}
+  aside{width:360px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column}
+  .head{padding:22px 22px 14px}
+  .brand{font-weight:800;letter-spacing:.14em;font-size:13px;color:var(--mute)}
+  h1{font-size:24px;font-weight:800;margin-top:6px;line-height:1.15}
+  .sub{color:var(--mute);font-size:13px;margin-top:6px;line-height:1.45}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 22px 14px}
+  .stat{background:#161a20;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
+  .stat b{display:block;font-size:20px;font-weight:800}
+  .stat span{font-size:11px;color:var(--mute)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 22px 12px}
+  .chip{border:1px solid var(--line);background:#161a20;color:var(--text);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
+  .chip i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .chip.off{opacity:.35}
+  .search{margin:0 22px 10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0e1115;color:var(--text);font:inherit;font-size:13px;outline:none}
+  .search:focus{border-color:#3a414b}
+  ul{list-style:none;overflow:auto;flex:1;padding:4px 12px 12px}
+  li{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer}
+  li:hover{background:#171b21}
+  li .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  li .n{font-size:13.5px;font-weight:600}
+  li .m{font-size:11.5px;color:var(--mute)}
+  li .q{margin-left:auto;font-size:10px;font-weight:700;color:#ffd166;border:1px solid #3a3320;padding:2px 6px;border-radius:6px}
+  .foot{padding:12px 22px;border-top:1px solid var(--line);font-size:11px;color:var(--mute);line-height:1.5}
+  .foot a{color:#9ab}
+  #map{flex:1;background:#0b0d10}
+  .leaflet-popup-content-wrapper{background:#13171c;color:var(--text);border-radius:14px;border:1px solid #262c34;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .leaflet-popup-tip{background:#13171c}
+  .leaflet-popup-content{margin:14px 16px;font-family:Inter,sans-serif;width:250px!important}
+  .pp-tag{font-size:10px;font-weight:800;letter-spacing:.1em}
+  .pp-n{font-size:16px;font-weight:800;margin:3px 0 2px}
+  .pp-c{font-size:12px;color:var(--mute)}
+  .pp-q{margin-top:10px;font-size:12.5px;line-height:1.5;color:#cfd4da;border-left:2px solid #ffd166;padding-left:10px}
+  .pp-w{margin-top:6px;font-size:11px;color:var(--mute)}
+  .mk{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#0b0d10;border:2px solid rgba(255,255,255,.85);box-shadow:0 0 0 4px rgba(0,0,0,.25),0 4px 14px rgba(0,0,0,.5)}
+  .mk.hq{background:#fff;font-size:8px}
+  .leaflet-control-attribution{background:rgba(11,13,16,.7)!important;color:#667!important}
+  .leaflet-control-attribution a{color:#889!important}
+  @media(max-width:760px){
+    #app{flex-direction:column-reverse}
+    aside{width:100%;height:46%;border-right:0;border-top:1px solid var(--line)}
+    .head{padding:14px 16px 8px} h1{font-size:19px} .sub{display:none}
+    .stats,.chips{padding-left:16px;padding-right:16px} .search{margin-left:16px;margin-right:16px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside>
+    <div class="head">
+      <div class="brand">DEOBLOCK</div>
+      <h1>Who buys DEOBLOCK</h1>
+      <p class="sub">Every team logo on deoblock.com/pages/teams, mapped to its home city. Gold "quote" = equipment-manager testimonial on their site.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="chips" id="chips"></div>
+    <input class="search" id="q" placeholder="Search team, city, state...">
+    <ul id="list"></ul>
+    <div class="foot">Source: <a href="https://deoblock.com/pages/teams" target="_blank">deoblock.com/pages/teams</a> (checked Oct 26, 2026). Their disclaimer: logos show teams that purchased, not partnerships. Pins = team home city, not exact delivery address. Teal-panther logo read as Carolina Panthers (not confirmed). Retail (Jerry's Hockey, 4 Chicago stores) not pinned.</div>
+  </aside>
+  <div id="map"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const CAT = {
+  nba:  {label:"NBA",  color:"var(--nba)",  hex:"#ff6b2c"},
+  pro:  {label:"Other pro", color:"var(--pro)", hex:"#a78bfa"},
+  ncaa: {label:"NCAA", color:"var(--ncaa)", hex:"#3ba7ff"},
+  club: {label:"Club", color:"var(--club)", hex:"#34d399"},
+};
+const T = [
+  ["Chicago Bulls","nba","Chicago, IL",41.8807,-87.6742,"CHI"],
+  ["Boston Celtics","nba","Boston, MA",42.3662,-71.0621,"BOS"],
+  ["LA Clippers","nba","Inglewood, CA",33.9447,-118.3433,"LAC"],
+  ["New York Knicks","nba","New York, NY",40.7505,-73.9934,"NYK",{w:"Kyle, Equipment Operations",q:"I've been an equipment manager for over 15 years, and getting the harsh odor out of the locker room was impossible until DEOBLOCK. Day and night results compared to anything else on the market."}],
+  ["San Antonio Spurs","nba","San Antonio, TX",29.4270,-98.4375,"SAS"],
+  ["Carolina Panthers (NFL)","pro","Charlotte, NC",35.2258,-80.8528,"CAR"],
+  ["Edmonton Elks (CFL)","pro","Edmonton, AB",53.5597,-113.4764,"EDM"],
+  ["Angel City FC (NWSL)","pro","Los Angeles, CA",34.0128,-118.2841,"ACFC"],
+  ["U.S. Soccer","pro","Chicago, IL",41.8579,-87.6208,"USA"],
+  ["Medinah Country Club","club","Medinah, IL",41.9814,-88.0459,"MCC",{w:"Fito, Locker Room Manager",q:"I have been at the club for over 30 years, this is the best product I have used."}],
+  ["BYU","ncaa","Provo, UT",40.2518,-111.6493,"BYU"],
+  ["Chattanooga","ncaa","Chattanooga, TN",35.0456,-85.2997,"UTC"],
+  ["Colorado","ncaa","Boulder, CO",40.0076,-105.2659,"CU",{w:"Bill, Director of Basketball Operations",q:"We use DEOBLOCK to keep the aroma in the locker room and travel bags pleasant. It is a noticeable difference in the locker room! We recommend DEOBLOCK to ALL!"}],
+  ["Creighton","ncaa","Omaha, NE",41.2655,-95.9467,"CRE"],
+  ["Dayton","ncaa","Dayton, OH",39.7404,-84.1793,"UD"],
+  ["DePaul","ncaa","Chicago, IL",41.9245,-87.6553,"DPU"],
+  ["Florida","ncaa","Gainesville, FL",29.6436,-82.3549,"UF"],
+  ["Louisiana Tech","ncaa","Ruston, LA",32.5276,-92.6479,"LT",{w:"Jason, Equipment Manager",q:"The most effective product we have ever used to neutralize bad odors. Nothing compares."}],
+  ["Navy","ncaa","Annapolis, MD",38.9827,-76.4842,"NAVY"],
+  ["Northwestern","ncaa","Evanston, IL",42.0565,-87.6753,"NU"],
+  ["Rutgers","ncaa","Piscataway, NJ",40.5008,-74.4474,"RU"],
+  ["Southern Miss","ncaa","Hattiesburg, MS",31.3285,-89.3346,"USM",{w:"Reid, Equipment Operations",q:"You guys definitely solved our locker room odor, the locker room smells 1000x better!"}],
+  ["San José State","ncaa","San Jose, CA",37.3352,-121.8811,"SJSU"],
+  ["SMU","ncaa","Dallas, TX",32.8412,-96.7845,"SMU",{w:"Frank, Equipment Manager",q:"100% amazing product! Has helped eliminate the odors in our locker room and would highly suggest placing in your facility!"}],
+  ["Maryland","ncaa","College Park, MD",38.9869,-76.9426,"UMD"],
+  ["TCU","ncaa","Fort Worth, TX",32.7096,-97.3628,"TCU"],
+  ["UAB","ncaa","Birmingham, AL",33.5021,-86.8064,"UAB"],
+  ["UCF","ncaa","Orlando, FL",28.6024,-81.2001,"UCF"],
+  ["UCLA","ncaa","Los Angeles, CA",34.0689,-118.4452,"UCLA"],
+  ["Charlotte","ncaa","Charlotte, NC",35.3071,-80.7352,"CLT",{w:"Dale, Director of Football Equipment",q:"Our locker room smelled like a wet dog. I ordered 150 DEOBLOCKS and put them in each locker, in trunks with helmets/shoulder pads, cleats. It made a huge difference."}],
+  ["North Carolina","ncaa","Chapel Hill, NC",35.9049,-79.0469,"UNC"],
+  ["Virginia","ncaa","Charlottesville, VA",38.0336,-78.5080,"UVA",{w:"Greg, Equipment Operations",q:"I can tell a difference in the whole locker room after these are in each locker. DEOBLOCK helped remove the odor from our wrestling shoes."}],
+  ["South Alabama","ncaa","Mobile, AL",30.6968,-88.1787,"JAGS",{w:"Davonte, Equipment Manager",q:"Amazing product! Our athletes noticed a big difference and are loving it."}],
+].map(r=>({name:r[0],cat:r[1],city:r[2],lat:r[3],lng:r[4],ab:r[5],t:r[6]}));
+
+const map = L.map('map',{zoomControl:false,worldCopyJump:true}).setView([39.5,-96],4);
+L.control.zoom({position:'topright'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+
+const hq = L.marker([41.8676,-87.6270],{icon:L.divIcon({className:'',html:'<div class="mk hq">HQ</div>',iconSize:[30,30],iconAnchor:[15,15]})})
+  .bindPopup('<div class="pp-tag" style="color:#fff">HEADQUARTERS</div><div class="pp-n">DEOBLOCK</div><div class="pp-c">Chicago, IL · DEO Company LLC</div>').addTo(map);
+
+const on = {nba:true,pro:true,ncaa:true,club:true};
+T.forEach(t=>{
+  const c = CAT[t.cat];
+  t.m = L.marker([t.lat,t.lng],{icon:L.divIcon({className:'',html:`<div class="mk" style="background:${c.hex}">${t.ab}</div>`,iconSize:[30,30],iconAnchor:[15,15]}),riseOnHover:true})
+    .bindPopup(`<div class="pp-tag" style="color:${c.hex}">${c.label.toUpperCase()}</div><div class="pp-n">${t.name}</div><div class="pp-c">${t.city}</div>`+
+      (t.t?`<div class="pp-q">"${t.t.q}"</div><div class="pp-w">${t.t.w}</div>`:''))
+    .addTo(map);
+});
+
+const stats = document.getElementById('stats');
+const count = k=>T.filter(t=>t.cat===k).length;
+stats.innerHTML = `<div class="stat"><b>${T.length}</b><span>teams</span></div>`+
+  ['nba','ncaa','pro'].map(k=>`<div class="stat"><b style="color:${CAT[k].hex}">${count(k)}</b><span>${CAT[k].label}</span></div>`).join('');
+
+const chips = document.getElementById('chips');
+Object.entries(CAT).forEach(([k,c])=>{
+  const b=document.createElement('button'); b.className='chip';
+  b.innerHTML=`<i style="background:${c.hex}"></i>${c.label} · ${count(k)}`;
+  b.onclick=()=>{on[k]=!on[k]; b.classList.toggle('off',!on[k]); render();};
+  chips.appendChild(b);
+});
+
+const list=document.getElementById('list'), q=document.getElementById('q');
+const order={nba:0,pro:1,club:2,ncaa:3};
+function render(){
+  const s=q.value.trim().toLowerCase();
+  list.innerHTML='';
+  T.slice().sort((a,b)=>order[a.cat]-order[b.cat]||a.name.localeCompare(b.name)).forEach(t=>{
+    const vis = on[t.cat] && (!s || (t.name+' '+t.city).toLowerCase().includes(s));
+    if(vis){ if(!map.hasLayer(t.m)) t.m.addTo(map);} else { map.removeLayer(t.m); return; }
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="dot" style="background:${CAT[t.cat].hex}"></span><div><div class="n">${t.name}</div><div class="m">${t.city}</div></div>`+(t.t?'<span class="q">QUOTE</span>':'');
+    li.onclick=()=>{map.flyTo([t.lat,t.lng],11,{duration:1.1}); setTimeout(()=>t.m.openPopup(),1150);};
+    list.appendChild(li);
+  });
+}
+q.oninput=render; render();
+</script>
+</body>
+</html>
